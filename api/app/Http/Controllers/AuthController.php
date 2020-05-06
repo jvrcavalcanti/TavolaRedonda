@@ -98,4 +98,19 @@ class AuthController extends Controller
             ], 409);
         }
     }
+
+    public static function getToken(Request $request)
+    {
+        return $request->bearerToken();
+    }
+
+    public static function getTokenId(Request $request)
+    {
+        return (new \Lcobucci\JWT\Parser())->parse(self::getToken($request))->getClaim("jti");
+    }
+
+    public static function getUserIdOfToken(Request $request)
+    {
+        return \Laravel\Passport\Token::find(self::getTokenId($request))->user_id;
+    }
 }

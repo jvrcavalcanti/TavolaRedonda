@@ -18,6 +18,9 @@ class CreateUsersTable extends Migration
             $table->string("name")->unique();
             $table->string("email")->unique();
             $table->string("password");
+            $table->integer("pth")->default(0);
+            $table->integer("ptp")->default(0);
+            $table->boolean("is_admins")->default(false);
             $table->timestamp('last_logged_in')->nullable();
             $table->timestamps();
         });

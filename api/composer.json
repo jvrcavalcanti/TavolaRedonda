@@ -42,6 +42,9 @@
         ],
         "serve": [
             "php -S localhost:8000 -t public"
+        ],
+        "passport:client": [
+            "php artisan passport:client --personal -n"
         ]
     }
 }

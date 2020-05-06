@@ -28,4 +28,9 @@ $router->group(["prefix" => "auth"], function () use ($router) {
 
 $router->group(['middleware' => "auth"], function () use ($router) {
     $router->get("/auth/test", fn() => response()->json(["message" => "Token valid :)"]));
+
+    $router->group(["prefix" => "post"], function () use ($router) {
+      $router->post("register", "PostController@create");
+      $router->get("list", "PostController@index");
+    });
 });
