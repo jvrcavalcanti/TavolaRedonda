@@ -11,8 +11,8 @@
 [X] Create Migrate
 [X] Post Register
 [X] Post List Order DESC
-[ ] Post Search
-[ ] Information Post Get by Id
+[X] Post Search
+[X] Information Post Get by Id
 
 ### Post manipulation
 

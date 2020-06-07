@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    private Post $model;
+
+    public function __construct()
+    {
+        $this->model = new Post();
+    }
+
     public function index()
     {
         return Post::orderBy("id", "desc")->get();
@@ -43,5 +50,38 @@ class PostController extends Controller
             "message" => "Post create successful",
             "post" => $post
         ]);
+    }
+
+    public function show(int $id)
+    {
+        $post = Post::find($id);
+        return response()->json($post, $post ? 200 : 204);
+    }
+
+    public function search(Request $request)
+    {
+        $this->validate($request, [
+            "q" => ["required", "string"]
+        ]);
+
+        $q = $request->input("q");
+
+        if (strpos($q, "!") === 0) {
+            return $this->searchByTag(str_replace("!", "#", $q));
+        }
+
+        return $this->searchByTitle($q);
+    }
+
+    public function searchByTitle(string $title)
+    {
+        $post = $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc")->get();
+        return response()->json($post);
+    }
+
+    public function searchByTag(string $tag)
+    {
+        $post = $this->model->where("tags", "like", "%{$tag}%")->orderBy("id", "desc")->get();
+        return response()->json($post);
     }
 }
