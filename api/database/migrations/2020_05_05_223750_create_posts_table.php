@@ -21,13 +21,10 @@ class CreatePostsTable extends Migration
             $table->unsignedBigInteger("like")->default(0);
             $table->unsignedBigInteger("dislike")->default(0);
             $table->enum("status", ["safe", "under analysis", "deleted"]);
-            $table->timestamps();
-        });
-
-        Schema::table("posts", function (Blueprint $table) {
             $table->foreignid("user_id")
                   ->constrained()
                   ->onDelete("cascade");
+            $table->timestamps();
         });
     }
 

@@ -16,21 +16,21 @@
 
 ### Post manipulation
 
-[ ] Like and Deslike
-[ ] Post Complaint
-[ ] Post Exclusion
+[X] Like and Deslike
+[&nbsp;&nbsp;] Post Complaint
+[&nbsp;&nbsp;] Post Exclusion
 [X] Opitinal: Cascate Exclusion 
 
 ## Coment
 
-[ ] Create Migrate
-[ ] Create Coment
-[ ] Exclusion
+[&nbsp;&nbsp;] Create Migrate
+[&nbsp;&nbsp;] Create Coment
+[&nbsp;&nbsp;] Exclusion
 
 ## User
 
-[ ] pth -> Points Help
-[ ] ptp -> Points Punish
-[ ] Punish Based in ptp
-[ ] Transform Admin
-[ ] Opitional: Cascate Exclusion
+[&nbsp;&nbsp;] pth -> Points Help
+[&nbsp;&nbsp;] ptp -> Points Punish
+[&nbsp;&nbsp;] Punish Based in ptp
+[&nbsp;&nbsp;] Transform Admin
+[&nbsp;&nbsp;] Opitional: Cascate Exclusion

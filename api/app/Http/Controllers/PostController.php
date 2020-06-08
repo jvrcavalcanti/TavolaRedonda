@@ -61,27 +61,65 @@ class PostController extends Controller
     public function search(Request $request)
     {
         $this->validate($request, [
-            "q" => ["required", "string"]
+            "q" => ["required", "string"],
+            "type" => ["required", "string"]
         ]);
 
         $q = $request->input("q");
+        $type = $request->input("type");
 
-        if (strpos($q, "!") === 0) {
-            return $this->searchByTag(str_replace("!", "#", $q));
+        if ($type == "tag") {
+            return response()->json(
+                $this->searchByTag($q)
+            );
         }
 
-        return $this->searchByTitle($q);
+        if ($type == "title") {
+            return response()->json(
+                $this->searchByTitle($q)
+            );
+        }
     }
 
     public function searchByTitle(string $title)
     {
-        $post = $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc")->get();
-        return response()->json($post);
+        return $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc")->get();
     }
 
     public function searchByTag(string $tag)
     {
-        $post = $this->model->where("tags", "like", "%{$tag}%")->orderBy("id", "desc")->get();
-        return response()->json($post);
+        return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc")->get();
+    }
+
+    public function like(Request $request)
+    {
+        $this->validate($request, [
+            "post_id" => ["required", "integer"]
+        ]);
+
+        $post = $this->model->find($request->input("post_id"));
+
+        $post->like ++;
+
+        return response()->json([
+            "success" => $post->save(),
+            "likes" => $post->like
+        ]);
+    }
+
+    public function dislike(Request $request)
+    {
+        $this->validate($request, [
+            "post_id" => ["required", "integer"]
+        ]);
+
+        $post = $this->model->find($request->input("post_id"));
+
+        $post->dislike ++;
+
+        return response()->json([
+            "success" => $post->save(),
+            "dislikes" => $post->dislike
+        ]);
     }
 }
