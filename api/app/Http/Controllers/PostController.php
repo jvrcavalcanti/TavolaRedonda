@@ -91,13 +91,9 @@ class PostController extends Controller
         return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc")->get();
     }
 
-    public function like(Request $request)
+    public function like(int $post_id)
     {
-        $this->validate($request, [
-            "post_id" => ["required", "integer"]
-        ]);
-
-        $post = $this->model->find($request->input("post_id"));
+        $post = $this->model->find($post_id);
 
         $post->like ++;
 
@@ -107,19 +103,27 @@ class PostController extends Controller
         ]);
     }
 
-    public function dislike(Request $request)
+    public function dislike(int $post_id)
     {
-        $this->validate($request, [
-            "post_id" => ["required", "integer"]
-        ]);
-
-        $post = $this->model->find($request->input("post_id"));
+        $post = $this->model->find($post_id);
 
         $post->dislike ++;
 
         return response()->json([
             "success" => $post->save(),
             "dislikes" => $post->dislike
+        ]);
+    }
+
+    public function complaint(int $post_id)
+    {
+        $post = $this->model->find($post_id);
+
+        $post->complaints ++;
+
+        return response()->json([
+            "success" => $post->save(),
+            "complaints" => $post->complaints
         ]);
     }
 }

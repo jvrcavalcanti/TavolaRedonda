@@ -17,7 +17,7 @@
 ### Post manipulation
 
 [X] Like and Deslike
-[&nbsp;&nbsp;] Post Complaint
+[X] Post Complaint
 [&nbsp;&nbsp;] Post Exclusion
 [X] Opitinal: Cascate Exclusion 
 
