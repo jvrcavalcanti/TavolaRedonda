@@ -13,6 +13,7 @@
 [X] Post List Order DESC
 [X] Post Search
 [X] Information Post Get by Id
+[X] Pagination in search and list
 
 ### Post manipulation
 

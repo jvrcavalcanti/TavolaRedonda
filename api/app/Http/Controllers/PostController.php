@@ -16,7 +16,7 @@ class PostController extends Controller
 
     public function index()
     {
-        return Post::orderBy("id", "desc")->get();
+        return Post::orderBy("id", "desc")->paginate(10);
     }
 
     public function create(Request $request)
@@ -70,25 +70,25 @@ class PostController extends Controller
 
         if ($type == "tag") {
             return response()->json(
-                $this->searchByTag($q)
+                $this->searchByTag($q)->paginate(10)
             );
         }
 
         if ($type == "title") {
             return response()->json(
-                $this->searchByTitle($q)
+                $this->searchByTitle($q)->paginate(10)
             );
         }
     }
 
     public function searchByTitle(string $title)
     {
-        return $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc")->get();
+        return $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc");
     }
 
     public function searchByTag(string $tag)
     {
-        return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc")->get();
+        return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc");
     }
 
     public function like(int $post_id)
