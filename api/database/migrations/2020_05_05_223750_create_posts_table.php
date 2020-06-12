@@ -18,9 +18,6 @@ class CreatePostsTable extends Migration
             $table->string("title")->unique();
             $table->text("content");
             $table->json("tags");
-            $table->bigInteger("complaints")->default(0);
-            $table->unsignedBigInteger("like")->default(0);
-            $table->unsignedBigInteger("dislike")->default(0);
             $table->enum("status", ["safe", "under analysis", "deleted"]);
             $table->foreignid("user_id")
                   ->constrained()

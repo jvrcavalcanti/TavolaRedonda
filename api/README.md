@@ -17,9 +17,9 @@
 
 ### Post manipulation
 
-[X] Like and Deslike
-[X] Post Complaint
-[&nbsp;&nbsp;] Post Exclusion
+[X] Like and Deslike associated with the user
+[ ] Post Complaint
+[X] Post Exclusion
 [X] Opitinal: Cascate Exclusion 
 
 ## Coment

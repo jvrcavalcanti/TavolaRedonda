@@ -37,8 +37,8 @@ $router->group(['middleware' => "auth"], function () use ($router) {
 
     $router->group(["prefix" => "post"], function () use ($router) {
       $router->post("register", "PostController@create");
-      $router->put("like/{post_id}", "PostController@like");
-      $router->put("dislike/{post_id}", "PostController@dislike");
-      $router->put("complaint/{post_id}", "PostController@complaint");
+      $router->put("/like/{id}", "PostController@like");
+      $router->put("/dislike/{id}", "PostController@dislike");
+      $router->delete("/destroy/{id}", "PostController@destroy");
     });
 });

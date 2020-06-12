@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Laravel\Passport\HasApiTokens;
 
-class Post extends Model implements AuthenticatableContract, AuthorizableContract
+class LikesDislikes extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasApiTokens;
 
@@ -19,7 +19,7 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        "title", "content", "tags", "like", "dislike", "user_id"
+        "post_id", "user_id", "like?"
     ];
 
     /**
@@ -28,20 +28,4 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [];
-
-    public static function countLikes(int $id)
-    {
-        return LikesDislikes::where([
-            ["post_id", $id],
-            ["like", true]
-        ])->count();
-    }
-
-    public static function countDislikes(int $id)
-    {
-        return LikesDislikes::where([
-            ["post_id", $id],
-            ["like", false]
-        ])->count();
-    }
 }

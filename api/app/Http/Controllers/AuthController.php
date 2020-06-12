@@ -16,14 +16,14 @@ class AuthController extends Controller
             "email" => 'required|email|unique:users',
             "password" => "required"
         ]);
-        
+
         try {
 
             $input = $request->all();
             $input["password"] = Hash::make($input["password"]);
 
             $user = new User;
-            
+
             $user->name = $input["name"];
             $user->email = $input["email"];
             $user->password = $input["password"];
@@ -60,9 +60,9 @@ class AuthController extends Controller
 
             $model = new User;
 
-            $input = $request->all();
+            $input = $request->only(["name", "password"]);
 
-            $user = User::where("name", $input["name"])->first();
+            $user = User::where("name", $input["name"])->firstOrFail();
 
             if (!$user) {
                 return response()->json([
@@ -109,8 +109,13 @@ class AuthController extends Controller
         return (new \Lcobucci\JWT\Parser())->parse(self::getToken($request))->getClaim("jti");
     }
 
+    public static function getUserOfToken(Request $request)
+    {
+        return \Laravel\Passport\Token::find(self::getTokenId($request));
+    }
+
     public static function getUserIdOfToken(Request $request)
     {
-        return \Laravel\Passport\Token::find(self::getTokenId($request))->user_id;
+        return self::getUserOfToken($request)->user_id;
     }
 }

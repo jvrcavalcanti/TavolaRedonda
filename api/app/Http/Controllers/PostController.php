@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\LikesDislikes;
 use App\Post;
+use App\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -26,7 +28,7 @@ class PostController extends Controller
             "content" => "required|string",
             "tags" => "required"
         ]);
-        
+
         $post = new Post();
 
         $data = $request->only(['title', 'content', 'tags']);
@@ -91,39 +93,78 @@ class PostController extends Controller
         return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc");
     }
 
-    public function like(int $post_id)
+    public function likeOrDislike(bool $liked, int $post_id)
     {
-        $post = $this->model->find($post_id);
+        $post = Post::findOrFail($post_id);
+        $user = AuthController::getUserOfToken(request());
 
-        $post->like ++;
+        $like = LikesDislikes::where([
+            ["post_id", $post->id],
+            ["user_id", $user->user_id]
+        ])->first();
+
+        if ($like && $like->like == $liked) {
+            return response()->json([
+                "message" => "User has already liked/disliked this post"
+            ]);
+        }
+
+        if (!$like) {
+            $like = new LikesDislikes();
+
+            $like->post_id = $post->id;
+            $like->user_id = $user->user_id;
+            $like->like = $liked;
+
+            $like->save();
+        }
+
+        if ($like) {
+            LikesDislikes::where([
+                ["post_id", $post_id],
+                ["user_id", $user->user_id]
+            ])->update([
+                "like" => $liked
+            ]);
+        }
+
+        if ($liked) {
+            $post->likes = Post::countLikes($post->id);
+        }
+
+        if (!$liked) {
+            $post->dislikes = Post::countDislikes($post_id);
+        }
 
         return response()->json([
-            "success" => $post->save(),
-            "likes" => $post->like
+            "post" => $post
         ]);
     }
 
-    public function dislike(int $post_id)
+    public function like(int $id)
     {
-        $post = $this->model->find($post_id);
-
-        $post->dislike ++;
-
-        return response()->json([
-            "success" => $post->save(),
-            "dislikes" => $post->dislike
-        ]);
+        return $this->likeOrDislike(true, $id);
     }
 
-    public function complaint(int $post_id)
+    public function dislike(int $id)
     {
-        $post = $this->model->find($post_id);
+        return $this->likeOrDislike(false, $id);
+    }
 
-        $post->complaints ++;
+    public function destroy(int $id)
+    {
+        $user = User::find(AuthController::getUserIdOfToken(request()));
+
+        if (!$user->is_admins) {
+            return response()->json([
+                "message" => "Forbidden"
+            ], 403);
+        }
+
+        $result = Post::where("id", $id)->delete();
 
         return response()->json([
-            "success" => $post->save(),
-            "complaints" => $post->complaints
+            "success" => $result ? true : false
         ]);
     }
 }
