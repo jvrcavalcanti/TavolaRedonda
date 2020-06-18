@@ -26,7 +26,7 @@
 
 [X] Create Migrate
 [X] Create Coment
-[&nbsp;&nbsp;] Exclusion
+[X] Exclusion
 
 ## User
 

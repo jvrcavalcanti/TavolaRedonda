@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Coment;
+use App\User;
 use Illuminate\Http\Request;
 
 class ComentController extends Controller
@@ -24,5 +25,23 @@ class ComentController extends Controller
             "success" => $coment->save(),
             "coment" => $coment
         ]);
+    }
+
+    public function destroy(int $id)
+    {
+        $user = User::find(AuthController::getUserIdOfToken(request()));
+
+        $coment = Coment::FindOrFail($id);
+
+        if ($user->is_admins) {
+            return response()->json([
+                "success" => $coment->delete(),
+                "message" => "Coment deleted"
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Not permission"
+        ], 403);
     }
 }

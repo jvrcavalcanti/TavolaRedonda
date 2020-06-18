@@ -44,5 +44,6 @@ $router->group(['middleware' => "auth"], function () use ($router) {
 
     $router->group(["prefix" => "coment"], function () use ($router) {
         $router->post("register", "ComentController@create");
+        $router->delete("destroy/{id}", "ComentController@destroy");
     });
 });
