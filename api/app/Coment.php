@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class Coment extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasApiTokens;
 
@@ -19,7 +19,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'name', 'email'
+        'content', 'post_id', 'user_id'
     ];
 
     /**
@@ -27,7 +27,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var array
      */
-    protected $hidden = [
-        'password',
-    ];
+    protected $hidden = [];
+
+    public function user()
+    {
+        return $this->hasMany("App\User");
+    }
+
+    public function post()
+    {
+        return $this->hasMany("App\Post");
+    }
 }

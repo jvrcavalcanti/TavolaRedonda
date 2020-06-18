@@ -29,6 +29,16 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $hidden = [];
 
+    public function comments()
+    {
+        return $this->hasMany("App\Comment");
+    }
+
+    public function user()
+    {
+        return $this->belongsTo("App\User");
+    }
+
     public static function countLikes(int $id)
     {
         return LikesDislikes::where([

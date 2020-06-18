@@ -105,7 +105,8 @@ class PostController extends Controller
 
         if ($like && $like->like == $liked) {
             return response()->json([
-                "message" => "User has already liked/disliked this post"
+                "success" => $like->delete(),
+                "message" => "Like/Dislike Deleted"
             ]);
         }
 
