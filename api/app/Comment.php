@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Laravel\Passport\HasApiTokens;
 
-class Coment extends Model implements AuthenticatableContract, AuthorizableContract
+class Comment extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasApiTokens;
 
@@ -31,11 +31,11 @@ class Coment extends Model implements AuthenticatableContract, AuthorizableContr
 
     public function user()
     {
-        return $this->hasMany("App\User");
+        return $this->hasOne("App\User");
     }
 
     public function post()
     {
-        return $this->hasMany("App\Post");
+        return $this->hasOne("App\Post");
     }
 }

@@ -30,6 +30,11 @@ $router->group(["prefix" => "post"], function () use ($router) {
   $router->get("list", "PostController@index");
   $router->get("search", "PostController@search");
   $router->get("show/{id}", "PostController@show");
+  $router->get("{id}/comments", "PostController@comments");
+});
+
+$router->group(["prefix" => "user"], function () use ($router) {
+    $router->get("/show/{id}", "UserController@show");
 });
 
 $router->group(['middleware' => "auth"], function () use ($router) {
@@ -42,8 +47,11 @@ $router->group(['middleware' => "auth"], function () use ($router) {
       $router->delete("/destroy/{id}", "PostController@destroy");
     });
 
-    $router->group(["prefix" => "coment"], function () use ($router) {
-        $router->post("register", "ComentController@create");
-        $router->delete("destroy/{id}", "ComentController@destroy");
+    $router->group(["prefix" => "comment"], function () use ($router) {
+        $router->post("register", "CommentController@create");
+        $router->delete("destroy/{id}", "CommentController@destroy");
+    });
+
+    $router->group(["prefix" => "user"], function () use ($router) {
     });
 });

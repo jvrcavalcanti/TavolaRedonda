@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Coment;
+use App\Comment;
 use App\User;
 use Illuminate\Http\Request;
 
-class ComentController extends Controller
+class CommentController extends Controller
 {
     public function create(Request $request)
     {
@@ -19,7 +19,7 @@ class ComentController extends Controller
 
         $inputs["user_id"] = AuthController::getUserIdOfToken($request);
 
-        $coment = new Coment($inputs);
+        $coment = new Comment($inputs);
 
         return response()->json([
             "success" => $coment->save(),
@@ -31,12 +31,12 @@ class ComentController extends Controller
     {
         $user = User::find(AuthController::getUserIdOfToken(request()));
 
-        $coment = Coment::FindOrFail($id);
+        $coment = Comment::FindOrFail($id);
 
         if ($user->is_admins) {
             return response()->json([
                 "success" => $coment->delete(),
-                "message" => "Coment deleted"
+                "message" => "Comment deleted"
             ]);
         }
 

@@ -18,7 +18,6 @@
 ### Post manipulation
 
 [X] Like and Deslike associated with the user
-[ ] Post Complaint
 [X] Post Exclusion
 [X] Opitinal: Cascate Exclusion 
 
@@ -34,4 +33,5 @@
 [&nbsp;&nbsp;] ptp -> Points Punish
 [&nbsp;&nbsp;] Punish Based in ptp
 [&nbsp;&nbsp;] Transform Admin
-[&nbsp;&nbsp;] Opitional: Cascate Exclusion
+[ ] User Complaint
+[X] Opitional: Cascate Exclusion

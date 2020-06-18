@@ -56,8 +56,10 @@ class PostController extends Controller
 
     public function show(int $id)
     {
-        $post = Post::find($id);
-        return response()->json($post, $post ? 200 : 204);
+        $post = Post::findOrFail($id);
+        return response()->json([
+            "post" => $post
+        ]);
     }
 
     public function search(Request $request)
@@ -166,6 +168,15 @@ class PostController extends Controller
 
         return response()->json([
             "success" => $result ? true : false
+        ]);
+    }
+
+    public function comments(int $id)
+    {
+        $post = Post::findOrFail($id);
+
+        return response()->json([
+            "comments" => $post->comments()->get()
         ]);
     }
 }
