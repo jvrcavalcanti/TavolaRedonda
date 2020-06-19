@@ -1,13 +1,15 @@
-import React, { useContext } from "react";
-import { Route, Switch } from "react-router-dom";
-import AuthContext from "../contexts/auth";
-import AppRoutes from "./app.route";
-import AuthRoutes from "./auth.route";
+import React from "react";
+import { Switch, Route } from "react-router-dom";
+import Home from "../pages/Home";
+import SignIn from "../pages/SignIn";
 
 const Routes: React.FC = () => {
-  const { signed } = useContext(AuthContext);
-  console.log(signed);
-  return signed ? <AppRoutes /> : <AuthRoutes/>;
+  return (
+    <Switch>
+      <Route path="/" exact component={Home} />
+      <Route path="/signin" exact component={SignIn} />
+    </Switch>
+  );
 };
 
 export default Routes;
