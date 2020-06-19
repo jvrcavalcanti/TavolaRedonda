@@ -16,9 +16,12 @@ class PostController extends Controller
         $this->model = new Post();
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return Post::orderBy("id", "desc")->paginate(10);
+        $limit = $request->input("limit") ?? 10;
+        $order = $request->input("order") ?? "asc";
+
+        return Post::orderBy("id", $order)->paginate($limit);
     }
 
     public function create(Request $request)
