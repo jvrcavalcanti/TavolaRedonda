@@ -3,6 +3,13 @@ import { Container, ListGroup } from "react-bootstrap";
 import api from "../../services/api";
 import Post from "../../components/Post";
 
+interface IPost {
+  id: Number;
+  title: string;
+  content: string;
+  tags: string;
+};
+
 const Home: React.FC = () => {
   const [posts, setPosts] = useState([]);
 
@@ -14,7 +21,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     getPosts();
-  }, [posts]);
+  }, []);
 
   return (
     <Container>
@@ -23,8 +30,8 @@ const Home: React.FC = () => {
       </div>
 
       <ListGroup>
-        {posts.map(post => (
-          <Post key={Math.random()} data={post} />
+        {posts.map((post: IPost) => (
+          <Post key={"post-" + post.id} data={post} />
         ))}
       </ListGroup>
     </Container>

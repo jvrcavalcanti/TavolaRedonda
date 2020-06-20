@@ -23,7 +23,7 @@ const Post: React.FC<Props> = ({ data }) => {
   function tagsToString(tags: string) {
     return JSON.parse(tags)
                .map((tag: string) => (
-              <Link to={"/search?tag=" + replaceTag(tag)} className="tag-link">
+              <Link key={tag} to={"/search?tag=" + replaceTag(tag)} className="tag-link">
                 &nbsp;{tag}
               </Link>
               )

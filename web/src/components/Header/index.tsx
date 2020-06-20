@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navbar, Nav, Button } from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 import Brand from "../../images/supostologo2.png";
 
 import "./style.scss";

@@ -17,13 +17,24 @@ interface AuthContextData {
   handleLogout(): void
 };
 
+function loadData(name: string) {
+  if (localStorage.getItem(name)) {
+    return atob(localStorage.getItem(name) as string);
+  }
+  return null;
+}
+
+function saveData(name: string, value: any) {
+  localStorage.setItem(name, btoa(value))
+}
+
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const history = useHistory();
-  const [signed, setSigned] = useState(false);
-  const [user, setUser] = useState({} as User);
-  const [token, setToken] = useState('');
+  const [signed, setSigned] = useState(!!loadData("signed"));
+  const [user, setUser] = useState(JSON.parse(loadData("user") ?? "{}") as User);
+  const [token, setToken] = useState(loadData("token") ?? "");
 
   async function handleSignIn(name: string | null | File, password: string | null | File) {
     const response = await api.post("/auth/login", {
@@ -31,8 +42,11 @@ export const AuthProvider: React.FC = ({ children }) => {
       password
     })
     const data = response.data.data;
+    saveData("token", data.token);
     setToken(data.token)
+    saveData("user", JSON.stringify(data.user));
     setUser(data.user);
+    saveData("signed", true);
     setSigned(true);
     history.goBack()
   }
@@ -41,6 +55,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     setToken("")
     setUser({} as User)
     setSigned(false)
+    localStorage.clear();
   }  
 
   return (
