@@ -41,17 +41,11 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public static function countLikes(int $id)
     {
-        return LikesDislikes::where([
-            ["post_id", $id],
-            ["like", true]
-        ])->count();
+        return LikesDislikes::where("post_id", $id)->where("like", true)->count();
     }
 
     public static function countDislikes(int $id)
     {
-        return LikesDislikes::where([
-            ["post_id", $id],
-            ["like", false]
-        ])->count();
+        return LikesDislikes::where("post_id", $id)->where("like", false)->count();
     }
 }

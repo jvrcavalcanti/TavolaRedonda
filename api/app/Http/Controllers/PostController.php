@@ -60,6 +60,10 @@ class PostController extends Controller
     public function show(int $id)
     {
         $post = Post::findOrFail($id);
+
+        $post->likes = Post::countLikes($post->id);
+        $post->dislikes = Post::countDislikes($post->id);
+
         return response()->json([
             "post" => $post
         ]);
