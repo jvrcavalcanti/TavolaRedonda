@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navbar, Form, Nav } from "react-bootstrap";
+import { Navbar, Nav, Button } from "react-bootstrap";
 import Brand from "../../images/supostologo2.png";
 
 import "./style.scss";
@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import AuthContext from "../../contexts/auth";
 
 const Header: React.FC = () => {
-  const { signed, user } = useContext(AuthContext);
+  const { signed, user, handleLogout } = useContext(AuthContext);
 
   return (
     <Navbar bg="dark" variant="dark" className="mb-5">
@@ -30,9 +30,23 @@ const Header: React.FC = () => {
       <Nav>
         {!signed ? (
           <Link to="/signin" className="btn btn-info">
-            Sign In
+            Entrar
           </Link>
-        ) : <label>{user.name}</label>}
+        ) : (
+          <ul className="navbar-nav mr-auto">
+            <li className="nav-item">
+              <label className="nav-link active username">
+                {user.name}
+              </label>
+            </li>
+
+            <li className="nav-item">
+              <label className="nav-link border rounded" onClick={handleLogout}>
+                Sair
+              </label>
+            </li>
+          </ul>
+        )}
       </Nav>
     </Navbar>
   );
