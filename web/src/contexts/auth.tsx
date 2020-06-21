@@ -13,7 +13,7 @@ interface AuthContextData {
   signed: boolean,
   token: string,
   user: User,
-  handleSignIn(name: string | null | File, password: string | null | File): Promise<void>,
+  handleSignIn(name: string, password: string): Promise<void>,
   handleLogout(): void
 };
 

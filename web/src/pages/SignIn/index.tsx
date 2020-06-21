@@ -11,7 +11,7 @@ const SignIn: React.FC = () => {
 
     const form = new FormData(event.currentTarget);
 
-    handleSignIn(form.get("name"), form.get("password"));
+    handleSignIn(form.get("name") as string, form.get("password") as string);
   }
 
   return (

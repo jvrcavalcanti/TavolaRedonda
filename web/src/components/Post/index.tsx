@@ -31,20 +31,22 @@ const Post: React.FC<Props> = ({ data }) => {
   }
 
   return (
-    <ListGroupItem className="mt-2 bg-danger">
-      <h1 className="text-center">
-        {data.title}
-      </h1>
+    <ListGroupItem className="mt-2 bg-danger text-center">
+      <Link className="link" to={"/post/" + data.id}>
+        <h1>
+          {data.title}
+        </h1>
+
+        <hr/>
+
+        <p>
+          {data.content}
+        </p>
+      </Link>
 
       <hr/>
 
       <p>
-        {data.content}
-      </p>
-
-      <hr/>
-
-      <p className="text-center">
         {tagsToString(data.tags)}
       </p>
     </ListGroupItem>
