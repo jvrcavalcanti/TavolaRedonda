@@ -3,6 +3,7 @@ import { ListGroupItem } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import "./style.scss";
+import Tags from "../Tags";
 
 interface IPost {
   id: Number;
@@ -16,19 +17,6 @@ interface Props {
 };
 
 const Post: React.FC<Props> = ({ data }) => {
-  function replaceTag(tag: string) {
-    return tag.replace("#", "!")
-  }
-  
-  function tagsToString(tags: string) {
-    return JSON.parse(tags)
-               .map((tag: string) => (
-              <Link key={tag} to={"/search?tag=" + replaceTag(tag)} className="tag-link">
-                &nbsp;{tag}
-              </Link>
-              )
-            )
-  }
 
   return (
     <ListGroupItem className="mt-2 bg-danger text-center">
@@ -47,7 +35,7 @@ const Post: React.FC<Props> = ({ data }) => {
       <hr/>
 
       <p>
-        {tagsToString(data.tags)}
+        <Tags value={data.tags} />
       </p>
     </ListGroupItem>
   );

@@ -28,12 +28,15 @@ const Header: React.FC = () => {
       </Nav>
 
       <Nav>
+        <ul className="navbar-nav mr-auto">
         {!signed ? (
-          <Link to="/signin" className="btn btn-info">
-            Entrar
-          </Link>
+          <li className="nav-item">
+            <Link to="/signin" className="nav-link border text-danger rounded">
+              Entrar
+            </Link>
+          </li>
         ) : (
-          <ul className="navbar-nav mr-auto">
+          <>
             <li className="nav-item">
               <label className="nav-link active username">
                 {user.name}
@@ -41,12 +44,13 @@ const Header: React.FC = () => {
             </li>
 
             <li className="nav-item">
-              <label className="nav-link border rounded" onClick={handleLogout}>
+              <label className="nav-link border text-danger rounded" onClick={handleLogout}>
                 Sair
               </label>
             </li>
-          </ul>
+          </>
         )}
+        </ul>
       </Nav>
     </Navbar>
   );

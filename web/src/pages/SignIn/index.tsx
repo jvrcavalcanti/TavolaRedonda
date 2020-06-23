@@ -1,22 +1,41 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import AuthContext from "../../contexts/auth";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Button, Alert } from "react-bootstrap";
 import Input from "../../components/Input";
+import { Form } from "@unform/web";
+import { FormHandles, SubmitHandler } from "@unform/core";
+
+interface FormData {
+  name: string;
+  password: string;
+};
 
 const SignIn: React.FC = () => {
+  const [error, setError] = useState("");
   const { handleSignIn } = useContext(AuthContext);
+  const formRef = useRef<FormHandles>(null);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const handleSubmit: SubmitHandler<FormData> = async (data) => {
+    const result = await handleSignIn(data.name as string, data.password as string);
 
-    const form = new FormData(event.currentTarget);
-
-    handleSignIn(form.get("name") as string, form.get("password") as string);
-  }
+    if (!result) {
+      setError("Usuário/Senha incorretos")
+    }
+  };
 
   return (
     <Container>
-      <Form id="signin" className="bg-danger border border-dark rounded p-2" onSubmit={handleSubmit} >
+      {error && (
+        <Alert variant="danger">
+          {error}
+        </Alert>
+      )}
+      <Form 
+        ref={formRef}
+        id="signin"
+        className="bg-danger border border-dark rounded p-2"
+        onSubmit={handleSubmit}
+      >
         <h1 className="text-center">
           Login
         </h1>

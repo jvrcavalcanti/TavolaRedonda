@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import api from "../../services/api";
 import { useParams } from "react-router-dom";
-import { tagsToString } from "../../services/tag";
+import Tags from "../../components/Tags";
 
 interface PostData {
   id: Number;
@@ -18,17 +18,15 @@ const Post: React.FC = () => {
   const [loged, setLoged] = useState(false);
   const [post, setPost] = useState({} as PostData);
 
-  async function loadPostData() {
+  const loadPostData = useCallback(async () => {
     const response = await api.get(`/post/show/${id}`)
     setPost(response.data.post as PostData);
     setLoged(true);
-  }
+  }, [id]);
 
   useEffect(() => {
     loadPostData();
-  }, [id]);
-
-  console.log(post)
+  }, [loadPostData]);
 
   return (
     <Container className="border border-dark rounded bg-danger p-3 text-center">
@@ -43,7 +41,7 @@ const Post: React.FC = () => {
           </p>
           <hr/>
           <p>
-            {tagsToString(post.tags)}
+            <Tags value={post.tags} />
           </p>
         </div>
       ) : (

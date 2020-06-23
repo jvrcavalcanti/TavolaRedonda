@@ -1,19 +1,55 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Form } from "react-bootstrap";
+import { useField } from "@unform/core";
 
 interface Props {
-  label: string;
-  type: string;
   name: string;
+  label?: string;
+  helper?: string
 };
 
-const Input: React.FC<Props> = ({label, type, name}) => {
+type InputProps = JSX.IntrinsicElements['input'] & Props;
+
+const Input: React.FC<InputProps> = ({name, label, helper, ...rest}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
+
+  useEffect(() => {
+    registerField({
+      name: fieldName,
+      path: "value",
+      ref: inputRef.current
+    })
+  }, [fieldName, registerField]);
+
   return (
     <Form.Group className="bg-dark text-white rounded">
-      <Form.Label className="p-1">
-        {label}
-      </Form.Label>
-      <Form.Control type={type} name={name} placeholder={label} required />
+      {label && (
+        <label className="p-1" htmlFor={fieldName}>
+          {label}
+        </label>
+      )}
+
+      <input
+        {...rest}
+        id={fieldName}
+        ref={inputRef}
+        defaultValue={defaultValue}
+        name={name}
+        placeholder={label}
+        required
+        className="form-control"
+      />
+
+      {helper && <small
+                  id="emailHelp"
+                  className="form-text text-muted p-1"
+                >
+                  {helper}
+                </small>
+      }
+
+      { error && <span>{error}</span> }
     </Form.Group>
   );
 };

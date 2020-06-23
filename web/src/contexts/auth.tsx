@@ -13,7 +13,7 @@ interface AuthContextData {
   signed: boolean,
   token: string,
   user: User,
-  handleSignIn(name: string, password: string): Promise<void>,
+  handleSignIn(name: string, password: string): Promise<boolean>,
   handleLogout(): void
 };
 
@@ -37,18 +37,23 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [token, setToken] = useState(loadData("token") ?? "");
 
   async function handleSignIn(name: string | null | File, password: string | null | File) {
-    const response = await api.post("/auth/login", {
-      name,
-      password
-    })
-    const data = response.data.data;
-    saveData("token", data.token);
-    setToken(data.token)
-    saveData("user", JSON.stringify(data.user));
-    setUser(data.user);
-    saveData("signed", true);
-    setSigned(true);
-    history.goBack()
+    try {
+      const response = await api.post("/auth/login", {
+        name,
+        password
+      })
+      const data = response.data.data;
+      saveData("token", data.token);
+      setToken(data.token)
+      saveData("user", JSON.stringify(data.user));
+      setUser(data.user);
+      saveData("signed", true);
+      setSigned(true);
+      history.goBack()
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   function handleLogout() {
