@@ -32,16 +32,13 @@ class PostController extends Controller
             "tags" => "required"
         ]);
 
-        $post = new Post();
-
         $data = $request->only(['title', 'content', 'tags']);
+
+        $data["tags"] = json_encode($data["tags"]);
 
         $data["user_id"] = AuthController::getUserIdOfToken($request);
 
-        $post->title = $data["title"];
-        $post->content = $data["content"];
-        $post->tags = json_encode($data["tags"]);
-        $post->user_id = $data["user_id"];
+        $post = new Post($data);
 
         $result = $post->save();
 
