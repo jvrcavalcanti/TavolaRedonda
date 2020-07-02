@@ -5,6 +5,7 @@ import Brand from "../../images/supostologo2.png";
 import "./style.scss";
 import { Link } from "react-router-dom";
 import AuthContext from "../../contexts/auth";
+import Button from "../Button";
 
 const Header: React.FC = () => {
   const { signed, user, handleLogout } = useContext(AuthContext);
@@ -30,11 +31,23 @@ const Header: React.FC = () => {
       <Nav>
         <ul className="navbar-nav mr-auto">
         {!signed ? (
-          <li className="nav-item">
-            <Link to="/signin" className="nav-link border text-danger rounded">
-              Entrar
-            </Link>
-          </li>
+          <>
+            <li className="nav-item mr-1">
+              <Link to="/signin" className="text-decoration-none">
+                <Button>
+                  Entrar
+                </Button>
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link to="/signup" className="text-decoration-none">
+                <Button>
+                  Cadastrar
+                </Button>
+              </Link>
+            </li>
+          </>
         ) : (
           <>
             <li className="nav-item">

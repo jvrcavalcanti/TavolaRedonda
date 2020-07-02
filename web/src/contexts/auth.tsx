@@ -9,12 +9,19 @@ interface User {
   is_admins: boolean;
 };
 
+interface UserRegister{
+  name: string;
+  password: string;
+  email: string;
+}
+
 interface AuthContextData {
   signed: boolean,
   token: string,
   user: User,
   handleSignIn(name: string, password: string): Promise<boolean>,
-  handleLogout(): void
+  handleLogout(): void,
+  handleRegister(data: UserRegister): Promise<void>
 };
 
 function loadData(name: string) {
@@ -61,7 +68,17 @@ export const AuthProvider: React.FC = ({ children }) => {
     setUser({} as User)
     setSigned(false)
     localStorage.clear();
-  }  
+  }
+  
+  async function handleRegister(data: UserRegister) {
+
+    const response = await api.post("/auth/register", data);
+    const responseData = response.data;
+
+    if (response.status === 200) {
+      handleSignIn(data.name, data.password)
+    }
+  }
 
   return (
     <AuthContext.Provider value = {{
@@ -69,7 +86,8 @@ export const AuthProvider: React.FC = ({ children }) => {
       user,
       token,
       handleSignIn,
-      handleLogout
+      handleLogout,
+      handleRegister
     }}>
       { children }
     </AuthContext.Provider>
