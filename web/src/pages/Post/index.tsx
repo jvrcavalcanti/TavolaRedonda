@@ -18,8 +18,8 @@ interface PostData {
   title: string;
   content: string;
   tags: string;
-  likes: Number;
-  dislikes: Number;
+  likes: number;
+  dislikes: number;
 };
 
 const Post: React.FC = () => {
@@ -68,6 +68,14 @@ const Post: React.FC = () => {
     })
     
     if (response.status === 200) {
+      if (status === 2) {
+        post.likes ++
+      }
+
+      if (status === 1) {
+        post.likes --
+      }
+      
       setStatus(status === 1 ? 2 : 1)
       setMessage("")
       return
@@ -89,6 +97,13 @@ const Post: React.FC = () => {
     })
     
     if (response.status === 200) {
+      if (status === 2) {
+        post.dislikes ++
+      }
+
+      if (status === 0) {
+        post.dislikes --
+      }
       setStatus(status === 0 ? 2 : 0)
       setMessage("")
       return
@@ -151,11 +166,17 @@ const Post: React.FC = () => {
             <Tags value={post.tags} />
           </p>
           <div className="d-flex">
-            <div className="w-50">
+            <div className="w-25">
               {handleBtnLike()}
             </div>
-            <div className="w-50">
+            <div className="w-25 pt-4">
+              {post.likes}
+            </div>
+            <div className="w-25">
               {handleBtnDisLike()}
+            </div>
+            <div className="w-25 pt-4">
+              {post.dislikes}
             </div>
           </div>
         </div>

@@ -4,7 +4,9 @@
 }
 
 body {
-    background-image: url("./images/fundo1.jpg");
-    background-repeat: no-repeat;
+    background: url("./images/fundo1.jpg") no-repeat fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
     background-size: cover;
 }
