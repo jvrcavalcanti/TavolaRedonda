@@ -3,11 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
-use App\User;
+use App\Repositories\CommentRepositoryEloquent;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
+    protected CommentRepositoryEloquent $repository;
+
+    public function __construct(CommentRepositoryEloquent $repository)
+    {
+        $this->repository = $repository;
+    }
+
     public function create(Request $request)
     {
         $this->validate($request, [
@@ -17,25 +24,23 @@ class CommentController extends Controller
 
         $inputs = $request->only(["content", "post_id"]);
 
-        $inputs["user_id"] = AuthController::getUserIdOfToken($request);
+        $inputs["user_id"] = auth()->user()->id;
 
-        $coment = new Comment($inputs);
+        $coment = $this->repository->create($inputs);
 
         return response()->json([
-            "success" => $coment->save(),
+            "success" => !!$coment,
             "coment" => $coment
         ]);
     }
 
     public function destroy(int $id)
     {
-        $user = User::find(AuthController::getUserIdOfToken(request()));
-
-        $coment = Comment::FindOrFail($id);
+        $user = auth()->user();
 
         if ($user->is_admins) {
             return response()->json([
-                "success" => $coment->delete(),
+                "success" => $this->repository->deleteById($id),
                 "message" => "Comment deleted"
             ]);
         }

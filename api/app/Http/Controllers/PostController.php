@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\LikesDislikes;
+use App\Likes;
 use App\Post;
+use App\Repositories\PostRepositoryEloquent;
 use App\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private Post $model;
+    protected PostRepositoryEloquent $repository;
 
-    public function __construct()
+    public function __construct(PostRepositoryEloquent $repository)
     {
-        $this->model = new Post();
+        $this->repository = $repository;
     }
 
     public function index(Request $request)
@@ -21,7 +22,7 @@ class PostController extends Controller
         $limit = $request->input("limit") ?? 10;
         $order = $request->input("order") ?? "asc";
 
-        return Post::orderBy("id", $order)->paginate($limit);
+        return $this->repository->list($limit, $order);
     }
 
     public function create(Request $request)
@@ -36,13 +37,11 @@ class PostController extends Controller
 
         $data["tags"] = json_encode($data["tags"]);
 
-        $data["user_id"] = AuthController::getUserIdOfToken($request);
+        $data["user_id"] = auth()->user()->id;
 
-        $post = new Post($data);
+        $post = $this->repository->create($data);
 
-        $result = $post->save();
-
-        if (!$result) {
+        if (!$post) {
             return response()->json([
                 "message" => "Post create failed!"
             ], 409);
@@ -56,10 +55,7 @@ class PostController extends Controller
 
     public function show(int $id)
     {
-        $post = Post::findOrFail($id);
-
-        $post->likes = Post::countLikes($post->id);
-        $post->dislikes = Post::countDislikes($post->id);
+        $post = $this->repository->find($id);
 
         return response()->json([
             "post" => $post
@@ -78,35 +74,35 @@ class PostController extends Controller
 
         if ($type == "tag") {
             return response()->json(
-                $this->searchByTag($q)->paginate(10)
+                $this->repository->searchByTag($q)->paginate(10)
             );
         }
 
         if ($type == "title") {
             return response()->json(
-                $this->searchByTitle($q)->paginate(10)
+                $this->repository->searchByTitle($q)->paginate(10)
             );
         }
     }
 
-    public function searchByTitle(string $title)
+    public function like($id)
     {
-        return $this->model->where("title", "like", "%{$title}%")->orderBy("id", "desc");
+        $this->likeOrDislike(true, $id);
     }
 
-    public function searchByTag(string $tag)
+    public function dislike($id)
     {
-        return $this->model->where("tags", "like", "%#{$tag}%")->orderBy("id", "desc");
+        $this->likeOrDislike(false, $id);
     }
 
     public function likeOrDislike(bool $liked, int $post_id)
     {
-        $post = Post::findOrFail($post_id);
-        $user = AuthController::getUserOfToken(request());
+        $post = $this->repository->find($post_id);
+        $user = auth()->user();
 
-        $like = LikesDislikes::where([
+        $like = Likes::where([
             ["post_id", $post->id],
-            ["user_id", $user->user_id]
+            ["user_id", $user->id]
         ])->first();
 
         if ($like && $like->like == $liked) {
@@ -117,19 +113,19 @@ class PostController extends Controller
         }
 
         if (!$like) {
-            $like = new LikesDislikes();
+            $like = new Likes();
 
             $like->post_id = $post->id;
-            $like->user_id = $user->user_id;
+            $like->user_id = $user->id;
             $like->like = $liked;
 
             $like->save();
         }
 
         if ($like) {
-            LikesDislikes::where([
+            Likes::where([
                 ["post_id", $post_id],
-                ["user_id", $user->user_id]
+                ["user_id", $user->id]
             ])->update([
                 "like" => $liked
             ]);
@@ -148,19 +144,9 @@ class PostController extends Controller
         ]);
     }
 
-    public function like(int $id)
-    {
-        return $this->likeOrDislike(true, $id);
-    }
-
-    public function dislike(int $id)
-    {
-        return $this->likeOrDislike(false, $id);
-    }
-
     public function destroy(int $id)
     {
-        $user = User::find(AuthController::getUserIdOfToken(request()));
+        $user = auth()->user();
 
         if (!$user->is_admins) {
             return response()->json([
@@ -168,16 +154,16 @@ class PostController extends Controller
             ], 403);
         }
 
-        $result = Post::where("id", $id)->delete();
+        $result = $this->repository->deleteById($id);
 
         return response()->json([
-            "success" => $result ? true : false
+            "success" => $result
         ]);
     }
 
     public function comments(int $id)
     {
-        $post = Post::findOrFail($id);
+        $post = $this->repository->find($id);
 
         return response()->json([
             "comments" => $post->comments()->get()

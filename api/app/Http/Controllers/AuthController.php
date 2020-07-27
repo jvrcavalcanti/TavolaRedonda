@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\UserRepositoryEloquent;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -9,6 +10,13 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
+    protected UserRepositoryEloquent $repository;
+
+    public function __construct(UserRepositoryEloquent $repository)
+    {
+        $this->repository = $repository;
+    }
+
     public function register(Request $request)
     {
         $this->validate($request, [
@@ -17,105 +25,40 @@ class AuthController extends Controller
             "password" => "required"
         ]);
 
-        try {
+        $input = $request->only(['name', 'email', 'password']);
 
-            $input = $request->all();
-            $input["password"] = Hash::make($input["password"]);
+        $user = $this->repository->create($input);
 
-            $user = new User;
+        $data = [
+            "token" => $user->createToken(env("APP_KEY"))->accessToken,
+            "user" => $user
+        ];
 
-            $user->name = $input["name"];
-            $user->email = $input["email"];
-            $user->password = $input["password"];
-
-            $user->save();
-
-            $data = [
-                "token" => $user->createToken(env("APP_KEY"))->accessToken,
-                "user" => $user
-            ];
-
-            unset($user->password);
-
-            return response()->json([
-                "data" => $data,
-                "message" => "User registraition successful!"
-            ], 200);
-
-        } catch(\Exception $e) {
-            return response()->json([
-                'message' => "User registration failed!"
-            ], 409);
-        }
+        return response()->json([
+            "data" => $data,
+            "message" => "User registraition successful!"
+        ], 200);
     }
 
     public function login(Request $request)
     {
         $this->validate($request, [
             "name" => "required|string",
-            "password" => "required"
+            "password" => "required|string"
         ]);
 
-        try {
+        ['name' => $name, 'password' => $password] = $request->only(["name", "password"]);
 
-            $model = new User;
+        $user = $this->repository->login($name, $password);
 
-            $input = $request->only(["name", "password"]);
+        $data = [
+            "token" => $user->createToken(env("APP_KEY"))->accessToken,
+            "user" => $user
+        ];
 
-            $user = User::where("name", $input["name"])->firstOrFail();
-
-            if (!$user) {
-                return response()->json([
-                    "message" => "User with name '" . $input["name"] . "' not found"
-                ], 204);
-            }
-
-            if (!Hash::check($input["password"], $user->password)) {
-                return response()->json([
-                    "message" => "Password incorrect"
-                ], 409);
-            }
-
-            $user->last_logged_in = Carbon::now();
-
-            $user->save();
-
-            $data = [
-                "token" => $user->createToken(env("APP_KEY"))->accessToken,
-                "user" => $user
-            ];
-
-            unset($user->password);
-
-            return response()->json([
-                "data" => $data,
-                "message" => "Login successful"
-            ]);
-
-        } catch(\Exception $e) {
-            return response()->json([
-                "message" => "User login faield!"
-            ], 409);
-        }
-    }
-
-    public static function getToken(Request $request)
-    {
-        return $request->bearerToken();
-    }
-
-    public static function getTokenId(Request $request)
-    {
-        return (new \Lcobucci\JWT\Parser())->parse(self::getToken($request))->getClaim("jti");
-    }
-
-    public static function getUserOfToken(Request $request)
-    {
-        return \Laravel\Passport\Token::find(self::getTokenId($request));
-    }
-
-    public static function getUserIdOfToken(Request $request)
-    {
-        return self::getUserOfToken($request)->user_id;
+        return response()->json([
+            "data" => $data,
+            "message" => "Login successful"
+        ]);
     }
 }

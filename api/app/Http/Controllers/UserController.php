@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\LikesDislikes;
+use App\Likes;
+use App\Repositories\UserRepositoryEloquent;
 use App\User;
 
 class UserController extends Controller
 {
+    protected UserRepositoryEloquent $repository;
+
+    public function __construct(UserRepositoryEloquent $repository)
+    {
+        $this->repository = $repository;
+    }
+
     public function show(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->repository->find($id);
 
         return response()->json([
             "user" => $user
@@ -18,9 +26,9 @@ class UserController extends Controller
 
     public function post(int $post_id)
     {
-        $user_id = AuthController::getUserIdOfToken(request());
+        $user_id = auth()->user()->id;
 
-        $like = LikesDislikes::where('user_id', $user_id)
+        $like = Likes::where('user_id', $user_id)
                              ->where("post_id", $post_id)
                              ->first();
 
