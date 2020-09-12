@@ -1,37 +1,4 @@
-# Távola Redonda - API
+Todos:
 
-## Auth
-
-[X] Integration Lumen + Passport
-[X] Auth Login
-[X] Auth Register
-
-## Post
-
-[X] Create Migrate
-[X] Post Register
-[X] Post List Order DESC
-[X] Post Search
-[X] Information Post Get by Id
-[X] Pagination in search and list
-
-### Post manipulation
-
-[X] Like and Deslike associated with the user
-[X] Post Exclusion
-[X] Opitinal: Cascate Exclusion 
-
-## Coment
-
-[X] Create Migrate
-[X] Create Coment
-[X] Exclusion
-
-## User
-
-[&nbsp;&nbsp;] pth -> Points Help
-[&nbsp;&nbsp;] ptp -> Points Punish
-[&nbsp;&nbsp;] Punish Based in ptp
-[&nbsp;&nbsp;] Transform Admin
-[ ] User Complaint
-[X] Opitional: Cascate Exclusion
+[] Auth
+[] Post (create, list, find, delete, update)
