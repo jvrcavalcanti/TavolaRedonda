@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,12 @@ Route::prefix('api/v1')->group(function () {
         Route::
             middleware(['auth:sanctum'])
             ->get('check', fn() => response()->json(['message' => 'Token valid']));
+    });
+
+    // Tag
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [TagController::class, 'index'])->name('tags.index');
+        Route::get('/{tag}', [TagController::class, 'show'])->where('id', '[0-9]+')->name('tags.show');
     });
 });
 
