@@ -15,14 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('api/v1')->group(function () {
+    // Auth
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->name('auth.register');
         Route::post('login', [AuthController::class, 'login'])->name('auth.login');
-        Route::middleware(['auth:sanctum'])->get('check', function () {
-            return response()->json([
-                'message' => 'Token valid'
-            ]);
-        });
+        Route::
+            middleware(['auth:sanctum'])
+            ->get('check', fn() => response()->json(['message' => 'Token valid']));
     });
 });
 

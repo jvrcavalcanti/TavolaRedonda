@@ -1,4 +1,4 @@
 Todos:
 
-[] Auth
+[X] Auth
 [] Post (create, list, find, delete, update)

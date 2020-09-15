@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\UserRepository;
-use App\Rules\LowerCase;
+use App\Rules\AlphaNotNum;
+use App\Rules\Lowercase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -18,8 +20,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $request->validate([
-            'username' => 'required|max:30',
-            'password' => 'required|max:30'
+            'username' => ['required', 'alpha_dash', 'max:30', 'min:3', new Lowercase],
+            'password' => 'required|alpha_num|max:30|min:8'
         ]);
 
         try {
@@ -39,18 +41,27 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'username' => ['required', 'unique:users', 'max:30'],
-            'password' => 'required|max:30'
+        $validator = Validator::make($request->all(), [
+            'username' => ['required', 'alpha_dash', 'unique:users', 'min:3', 'max:30', new Lowercase],
+            'email' => 'required|email|unique:users',
+            'password' => 'required|alpha_num|max:30|min:8'
         ]);
 
-        if ($data['username'] !== strtolower($data['username'])) {
+        if ($validator->fails()) {
             return response()->json([
-                'message' => 'Username must be lowercase'
+                'messages' => $validator->errors()->all()
             ], 400);
         }
 
-        $user = $this->repository->createUser($data);
+        $data = $request->only(['username', 'email', 'password']);
+
+        try {
+            $user = $this->repository->createUser($data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
 
         return response()->json([
             'message' => 'User created successfully',
