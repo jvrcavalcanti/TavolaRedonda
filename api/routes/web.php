@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,17 @@ Route::prefix('api/v1')->group(function () {
     Route::prefix('tags')->group(function () {
         Route::get('/', [TagController::class, 'index'])->name('tags.index');
         Route::get('/{tag}', [TagController::class, 'show'])->where('id', '[0-9]+')->name('tags.show');
+    });
+
+    Route::prefix('posts')->group(function () {
+        Route::get('/{post}', [PostController::class, 'show']);
+    });
+});
+
+Route::middleware('auth:sanctum')->prefix('api/v1')->group(function () {
+    // Post
+    Route::prefix('posts')->group(function () {
+        Route::post('/create', [PostController::class, 'create']);
     });
 });
 
