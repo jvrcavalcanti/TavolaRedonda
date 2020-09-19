@@ -34,6 +34,7 @@ Route::prefix('api/v1')->group(function () {
 
     Route::prefix('posts')->group(function () {
         Route::get('/{post}', [PostController::class, 'show']);
+        Route::get('/', [PostController::class, 'index']);
     });
 });
 
@@ -41,6 +42,7 @@ Route::middleware('auth:sanctum')->prefix('api/v1')->group(function () {
     // Post
     Route::prefix('posts')->group(function () {
         Route::post('/create', [PostController::class, 'create']);
+        Route::delete('/delete/{post}', [PostController::class, 'delete']);
     });
 });
 

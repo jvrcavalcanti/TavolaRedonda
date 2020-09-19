@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Repositories\PostRepository;
-use App\Rules\JsonArray;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,11 +16,42 @@ class PostController extends Controller
         $this->repository = $repository;
     }
 
+    public function index(Request $request)
+    {
+        $posts = \App\Models\Post::
+                                orderBy('id', $request->input('order') ?? 'desc')
+                                ->simplePaginate($request->input('limit') ?? 5);
+        return response()->json($posts);
+    }
+
     public function show(Post $post)
     {
         return response()->json([
             'post' => $post
         ]);
+    }
+
+    public function delete(Post $post)
+    {
+        if (!auth()->user()->admin) {
+            return response()->json([
+                'message' => "Unauthenticated"
+            ], 401);
+        }
+
+        try {
+            $post->delete();
+
+            return response()->json([
+                'message' => 'Post deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
+
+
     }
 
     public function create(Request $request)

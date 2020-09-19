@@ -35,12 +35,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Route::bind('post', function ($id) {
-            $post = \App\Models\Post::findOrFail($id);
-            $post->tags = json_decode($post->tags);
-            return $post;
-        });
-
         $this->configureRateLimiting();
 
         $this->routes(function () {
@@ -50,6 +44,10 @@ class RouteServiceProvider extends ServiceProvider
             Route::prefix('api')
                 ->middleware('api')
                 ->group(base_path('routes/api.php'));
+        });
+
+        Route::bind('post', function ($id) {
+            return (new \App\Repositories\PostRepository)->findById($id);
         });
     }
 
