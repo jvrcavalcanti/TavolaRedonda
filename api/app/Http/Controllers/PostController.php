@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Repositories\LikeRepository;
 use App\Repositories\PostRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,10 +11,12 @@ use Illuminate\Support\Facades\Validator;
 class PostController extends Controller
 {
     private PostRepository $repository;
+    private LikeRepository $likeRepository;
 
-    public function __construct(PostRepository $repository)
+    public function __construct(PostRepository $repository, LikeRepository $likeRepository)
     {
         $this->repository = $repository;
+        $this->likeRepository = $likeRepository;
     }
 
     public function index(Request $request)
@@ -35,8 +38,8 @@ class PostController extends Controller
     {
         if (!auth()->user()->admin) {
             return response()->json([
-                'message' => "Unauthenticated"
-            ], 401);
+                'message' => "Forbidden"
+            ], 403);
         }
 
         try {
@@ -83,6 +86,57 @@ class PostController extends Controller
             return response()->json([
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function like(Post $post, bool $value)
+    {
+        $user_id = auth()->user()->id;
+        $post_id = $post->id;
+
+        try {
+            if (!$this->likeRepository->exists($user_id, $post_id)) {
+                $this->likeRepository->create($value, $user_id, $post_id);
+
+                return response()->json([
+                    'message' => 'Post liked'
+                ], 201);
+            }
+
+            $like = $this->likeRepository->findByIds($user_id, $post_id);
+
+            if ($like->value != $value) {
+                $this->likeRepository->changeValue($user_id, $post_id);
+
+                return response()->json([
+                    'message' => 'Change'
+                ]);
+            } else {
+                $like->delete();
+
+                return response()->json([
+                    'message' => 'Deleted'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function likeStatus(Post $post)
+    {
+        $user_id = auth()->user()->id;
+        $post_id = $post->id;
+
+        try {
+            $like = $this->likeRepository->findByIds($user_id, $post_id);
+
+            return response()->json([
+                'exists' =>  !is_null($like),
+                'value' => $like ? $like->value : null
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }
