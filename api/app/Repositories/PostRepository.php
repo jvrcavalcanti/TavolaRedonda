@@ -7,18 +7,25 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PostRepository
 {
-    public function create($data)
+    private TagRepository $repository;
+
+    public function __construct(TagRepository $repository)
     {
-        $data['tags'] = json_encode($data['tags']);
-        $post = new Post($data);
+        $this->repository = $repository;
+    }
+
+    public function create(Post $post)
+    {
+        $post->tags = json_encode($post->tags);
         $post->save();
-        return $this->decodeTags($post);
+        $this->decodeTags($post);
     }
 
     public function findById(int $id): Post
     {
         $post = Post::findOrFail($id);
-        return $this->decodeTags($post);
+        $this->decodeTags($post);
+        return $post;
     }
 
     public function all(string $order = "desc"): Collection
@@ -29,7 +36,11 @@ class PostRepository
 
     public function decodeTags(Post $post)
     {
-        $post->tags = json_decode($post->tags);
+        $tags = [];
+        foreach (json_decode($post->tags) as $id) {
+            $tags[] = $this->repository->findById($id)->name;
+        }
+        $post->tags = $tags;
         return $post;
     }
 

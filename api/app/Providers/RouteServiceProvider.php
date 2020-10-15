@@ -47,7 +47,7 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::bind('post', function ($id) {
-            return (new \App\Repositories\PostRepository)->findById($id);
+            return resolve(\App\Repositories\PostRepository::class)->findById($id);
         });
     }
 

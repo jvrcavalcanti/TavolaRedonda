@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Rules\Lowercase;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class AuthController extends Controller
         ]);
 
         try {
-            $user = $this->repository->login($data);
+            $user = $this->repository->login($data['username'], $data['password']);
 
             return response()->json([
                 'message' => 'Login successful!',
@@ -52,10 +53,10 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $data = $request->only(['username', 'email', 'password']);
+        $user = new User($request->only(['username', 'email', 'password']));
 
         try {
-            $user = $this->repository->createUser($data);
+            $this->repository->createUser($user);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Repositories\LikeRepository;
 use App\Repositories\PostRepository;
+use App\Rules\TagsArray;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,10 +22,11 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $posts = \App\Models\Post::
+        $paginator = \App\Models\Post::
                                 orderBy('id', $request->input('order') ?? 'desc')
                                 ->simplePaginate($request->input('limit') ?? 5);
-        return response()->json($posts);
+        $paginator->getCollection()->map(fn($post) => $this->repository->decodeTags($post));
+        return response()->json($paginator);
     }
 
     public function show(Post $post)
@@ -53,8 +55,6 @@ class PostController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
-
-
     }
 
     public function create(Request $request)
@@ -62,7 +62,7 @@ class PostController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255|min:1|unique:posts',
             'text' => 'required',
-            'tags' => ['required', 'array']
+            'tags' => ['required', new TagsArray]
         ]);
 
         if ($validator->fails()) {
@@ -71,12 +71,12 @@ class PostController extends Controller
             ], 400);
         }
 
-        $data = $request->only(['title', 'text', 'tags']);
+        $post = new Post($request->only(['title', 'text', 'tags']));
 
-        $data['user_id'] = auth()->user()->id;
+        $post->user_id = auth()->user()->id;
 
         try {
-            $post = $this->repository->create($data);
+            $this->repository->create($post);
 
             return response()->json([
                 'message' => 'Post created',
@@ -95,6 +95,7 @@ class PostController extends Controller
         $post_id = $post->id;
 
         try {
+            // Not exists, create a new register
             if (!$this->likeRepository->exists($user_id, $post_id)) {
                 $this->likeRepository->create($value, $user_id, $post_id);
 
@@ -105,12 +106,14 @@ class PostController extends Controller
 
             $like = $this->likeRepository->findByIds($user_id, $post_id);
 
+            // Change value ex: 1 => 0, 0 => 1
             if ($like->value != $value) {
                 $this->likeRepository->changeValue($user_id, $post_id);
 
                 return response()->json([
                     'message' => 'Change'
                 ]);
+            // Delete ex: 1 => 1, 0 => 0
             } else {
                 $like->delete();
 
@@ -119,7 +122,9 @@ class PostController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 

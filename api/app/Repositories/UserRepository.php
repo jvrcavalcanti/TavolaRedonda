@@ -7,21 +7,19 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository
 {
-    public function createUser(array $data): User
+    public function createUser(User $user)
     {
-        $data['password'] = Hash::make($data['password']);
-        $user = new User($data);
+        $user->password = Hash::make($user->password);
         $user->save();
-        return $user;
     }
 
-    public function login(array $data): User
+    public function login(string $username, string $password): User
     {
         $user = User::
-                    where('username', $data['username'])
+                    where('username', $username)
                     ->firstOrFail();
 
-        if (!Hash::check($data['password'], $user->password)) {
+        if (!Hash::check($password, $user->password)) {
             throw new \Exception("Invalid password");
         }
 

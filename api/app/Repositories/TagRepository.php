@@ -10,4 +10,9 @@ class TagRepository
     {
         return Tag::all();
     }
+
+    public function findById($id)
+    {
+        return Tag::find($id);
+    }
 }
