@@ -20,7 +20,7 @@ class UserRepository
                     ->firstOrFail();
 
         if (!Hash::check($password, $user->password)) {
-            throw new \Exception("Invalid password");
+            abort(400, 'Invalid password.');
         }
 
         return $user;

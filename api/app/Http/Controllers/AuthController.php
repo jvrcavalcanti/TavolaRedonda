@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use App\Repositories\UserRepository;
-use App\Rules\Lowercase;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthController extends Controller
 {
@@ -17,12 +18,9 @@ class AuthController extends Controller
         $this->repository = $repository;
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $data = $request->validate([
-            'username' => ['required', 'alpha_dash', 'max:30', 'min:3', new Lowercase],
-            'password' => 'required|alpha_num|max:30|min:8'
-        ]);
+        $data = $request->validated();
 
         try {
             $user = $this->repository->login($data['username'], $data['password']);
@@ -32,32 +30,20 @@ class AuthController extends Controller
                 'user' => $user,
                 'token' => $user->createToken('user.token')->plainTextToken
             ]);
-        } catch (\Exception $e) {
+        } catch (HttpException|NotFoundHttpException $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], 400);
         }
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => ['required', 'alpha_dash', 'unique:users', 'min:3', 'max:30', new Lowercase],
-            'email' => 'required|email|unique:users',
-            'password' => 'required|alpha_num|max:30|min:8'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'messages' => $validator->errors()->all()
-            ], 400);
-        }
-
-        $user = new User($request->only(['username', 'email', 'password']));
+        $user = new User($request->validated());
 
         try {
             $this->repository->createUser($user);
-        } catch (\Exception $e) {
+        } catch (HttpException|NotFoundHttpException $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ]);
